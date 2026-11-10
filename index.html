@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dan Koe 中文译文库</title>
+<style>
+  :root{
+    --paper:#faf7f2; --card:#ffffff; --ink:#1e1b18; --soft:#6b6259;
+    --rule:#e6dfd4; --accent:#a8442a; --accent-soft:#f3e6dd;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--paper);color:var(--ink)}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif;
+    font-size:16px;line-height:1.7;-webkit-font-smoothing:antialiased;
+  }
+  header.top{
+    position:sticky;top:0;z-index:20;background:rgba(250,247,242,.94);
+    backdrop-filter:blur(8px);border-bottom:1px solid var(--rule);
+    padding:14px 18px 10px;
+  }
+  .brand{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+  .brand h1{font-size:18px;margin:0;letter-spacing:-.01em}
+  .brand .stat{font-size:12.5px;color:var(--soft)}
+  .stat b{color:var(--accent);font-weight:600}
+  .bar{height:3px;border-radius:2px;background:var(--rule);margin:10px 0;overflow:hidden}
+  .bar i{display:block;height:100%;width:100.00%;background:var(--accent);border-radius:2px}
+  .tools{display:flex;gap:8px;align-items:center}
+  input[type=search]{
+    flex:1;min-width:0;border:1px solid var(--rule);background:var(--card);
+    border-radius:9px;padding:9px 12px;font-size:15px;color:var(--ink);outline:none;
+  }
+  input[type=search]:focus{border-color:var(--accent)}
+  .chip{
+    border:1px solid var(--rule);background:var(--card);border-radius:999px;
+    padding:8px 12px;font-size:13px;color:var(--soft);white-space:nowrap;cursor:pointer;
+  }
+  .chip[aria-pressed=true]{background:var(--accent);border-color:var(--accent);color:#fff}
+  main{max-width:720px;margin:0 auto;padding:18px 18px 80px}
+  .year{font-size:12px;letter-spacing:.18em;color:var(--accent);margin:26px 0 10px;font-weight:600}
+  .item{
+    display:block;width:100%;text-align:left;border:1px solid var(--rule);
+    background:var(--card);border-radius:12px;padding:14px 15px;margin-bottom:9px;
+    cursor:pointer;font:inherit;color:inherit;transition:border-color .15s,transform .15s;
+  }
+  .item:active{transform:scale(.995)}
+  .item:hover{border-color:#d8cec0}
+  .item .row{display:flex;gap:8px;align-items:baseline;justify-content:space-between}
+  .item h2{font-size:16.5px;margin:0 0 4px;line-height:1.5;font-weight:650}
+  .item .meta{font-size:12px;color:var(--soft);white-space:nowrap}
+  .item p{margin:0;font-size:13.5px;color:var(--soft);line-height:1.65}
+  .tag{display:inline-block;font-size:11px;padding:1px 7px;border-radius:6px;margin-right:6px;vertical-align:1px}
+  .tag.done{background:var(--accent);color:#fff}
+  .tag.paid,.tag.wait{background:#f1ece4;color:#8a7c6d}
+  .empty{text-align:center;color:var(--soft);font-size:14px;padding:60px 0}
+  .foot{margin-top:36px;font-size:12.5px;color:var(--soft);line-height:1.8;border-top:1px solid var(--rule);padding-top:16px}
+  #reader{position:fixed;inset:0;z-index:40;background:var(--paper);display:none;flex-direction:column}
+  #reader.on{display:flex}
+  #reader .rhead{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--rule);background:rgba(250,247,242,.96)}
+  #reader .rhead .t{flex:1;min-width:0;font-size:14px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  #reader button{border:1px solid var(--rule);background:var(--card);color:var(--ink);border-radius:8px;padding:7px 11px;font-size:13px;cursor:pointer}
+  #reader a.ext{font-size:12.5px;color:var(--accent);text-decoration:none;border:1px solid var(--accent-soft);border-radius:8px;padding:7px 10px;background:var(--card)}
+  #rbody{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;background:var(--paper)}
+  #rbody article{max-width:660px;margin:0 auto;padding:26px 20px 90px}
+  #rbody .loading{padding:40px 24px;color:var(--soft);font-size:14px}
+  @media (prefers-color-scheme: dark){
+    :root{
+      --paper:#17150f; --card:#1e1b15; --ink:#eae4da; --soft:#a29a90;
+      --rule:#332e26; --accent:#e08a5f; --accent-soft:#2a211a;
+    }
+    .tag.paid,.tag.wait{background:#2a251e;color:#a29a90}
+    header.top{background:rgba(23,21,15,.94)}
+    #reader .rhead{background:rgba(23,21,15,.96)}
+  }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand">
+    <h1>Dan Koe 中文译文库</h1>
+    <span class="stat">已译 <b>74</b> / 74 篇 · 原文共 276,622 词</span>
+  </div>
+  <div class="bar"><i></i></div>
+  <div class="tools">
+    <input type="search" id="q" placeholder="搜索标题或摘要" autocomplete="off">
+    <button class="chip" id="f" aria-pressed="false">只看已译</button>
+  </div>
+</header>
+<main id="list"></main>
+<div class="foot">
+  译文按发布时间从新到旧排列。付费文章只有公开部分，译文到预览结束处为止。<br>
+  原文：letters.thedankoe.com · 版权归 Dan Koe 所有。
+</div>
+
+<div id="reader">
+  <div class="rhead">
+    <button id="close">关闭</button>
+    <div class="t" id="rt"></div>
+    <a class="ext" id="rl" target="_blank" rel="noopener">原文</a>
+  </div>
+  <div id="rbody"></div>
+</div>
+
+<script>
+const DATA = [{"slug":"the-most-lucrative-ai-business-to","date":"2026-11-03","zh":"2027 年最赚钱的 AI 生意","en":"The most lucrative AI business to start in 2027","summary":"把一个人做成一支创意团队：品牌策略、内容策略、写作三合一，以及如何拿下第一个客户。","words":3645,"paid":false,"file":"articles/the-most-lucrative-ai-business-to.html","done":true,"ext":null},{"slug":"the-influencer-is-dead-the-age-of","date":"2026-10-20","zh":"网红已死，体验时代到来","en":"The influencer is dead. The Age of Experience is here.","summary":"网红、个人品牌、匠人三类创作者的分野，以及如何建一座想法博物馆，找到只有你能给出的视角。","words":2952,"paid":false,"file":"articles/the-influencer-is-dead-the-age-of.html","done":true,"ext":null},{"slug":"full-course-how-to-turn-your-interests","date":"2026-10-05","zh":"完整课程：把兴趣变成能赚钱的生活方式生意","en":"Full Course: How To Turn Your Interests Into Profitable a Lifestyle Business","summary":"从一堆兴趣出发，一步步搭出一门自己愿意做、也养得活自己的生意。","words":6760,"paid":false,"file":"articles/full-course-how-to-turn-your-interests.html","done":true,"ext":null},{"slug":"how-to-launch-into-a-completely-new-ef8","date":"2026-09-19","zh":"如何启动一段全新的人生","en":"How to launch into a completely new life","summary":"把改变做得简单到失败都显得愚蠢。","words":2870,"paid":false,"file":"articles/how-to-launch-into-a-completely-new-ef8.html","done":true,"ext":null},{"slug":"you-need-to-be-delusional-if-you","date":"2026-09-12","zh":"想成功，你必须有点妄想","en":"You need to be delusional if you want to succeed","summary":"如何进入超成功者所在的那个现实。","words":2829,"paid":false,"file":"articles/you-need-to-be-delusional-if-you.html","done":true,"ext":null},{"slug":"the-one-human-business-how-to-earn","date":"2026-09-06","zh":"一人公司：AI 时代怎么赚钱","en":"The One-Human Business: How To Earn In The Age of AI","summary":"兴趣 + 社交媒体 + AI = 现代生意。","words":3818,"paid":false,"file":"articles/the-one-human-business-how-to-earn.html","done":true,"ext":null},{"slug":"we-are-in-the-middle-of-the-digital","date":"2026-08-27","zh":"数字文艺复兴正在进行，请利用它","en":"We are in the middle of the digital renaissance, please take advantage of it","summary":"未来的三种人，以及为什么通才在 AI 时代胜出。","words":3476,"paid":false,"file":"articles/we-are-in-the-middle-of-the-digital.html","done":true,"ext":null},{"slug":"give-me-20-minutes-and-ill-make-you","date":"2026-08-19","zh":"给我 20 分钟，让你无法被操控","en":"Give me 20 minutes and i’ll make you impossible to manipulate","summary":"如何不被观点、叙事和情绪牵着走。","words":3616,"paid":false,"file":"articles/give-me-20-minutes-and-ill-make-you.html","done":true,"ext":null},{"slug":"strategy-vs-tactics-how-to-actually","date":"2026-08-08","zh":"战略思考的艺术","en":"The Art Of Strategic Thinking (How To Become Wildly Successful)","summary":"大多数人沉迷于虚假的进步，而且看得出来。","words":5542,"paid":false,"file":"articles/strategy-vs-tactics-how-to-actually.html","done":true,"ext":null},{"slug":"how-to-remember-everything-you-read","date":"2026-07-25","zh":"别试图记住你读过的一切","en":"How to remember everything you read... don't","summary":"学任何东西最快的方法。","words":3973,"paid":false,"file":"articles/how-to-remember-everything-you-read.html","done":true,"ext":null},{"slug":"the-writing-habit-that-saved-my-brain","date":"2026-07-15","zh":"救了我大脑（和未来）的写作习惯","en":"The writing habit that saved my brain (and my future)","summary":"一个习惯等于学得更快、想得更清、赚得更多。","words":3148,"paid":false,"file":"articles/the-writing-habit-that-saved-my-brain.html","done":true,"ext":null},{"slug":"the-most-profitable-skill-of-the","date":"2026-07-03","zh":"21 世纪最赚钱的技能（不是 AI）","en":"The most profitable skill of the 21st century (not AI)","summary":"如何拉动心理杠杆，拿到你想要的东西。","words":2591,"paid":false,"file":"articles/the-most-profitable-skill-of-the.html","done":true,"ext":null},{"slug":"how-to-survive-ai-mass-replacement","date":"2026-06-22","zh":"如何变得有价值到 AI 无法取代","en":"How to become so valuable AI will never replace you","summary":"决定你未来的 5 项技能。","words":4334,"paid":false,"file":"articles/how-to-survive-ai-mass-replacement.html","done":true,"ext":null},{"slug":"how-to-turn-your-love-for-learning","date":"2026-06-02","zh":"把对学习的热爱变成一人公司","en":"How to turn your love for learning into a one-person business","summary":"兴趣多不是别人让你以为的那种弱点。","words":3176,"paid":false,"file":"articles/how-to-turn-your-love-for-learning.html","done":true,"ext":null},{"slug":"growing-on-social-media-is-easy-actually","date":"2026-05-07","zh":"在社交媒体上涨粉其实很简单","en":"Growing on social media is easy, actually","summary":"两个可以拉的杠杆。","words":3169,"paid":false,"file":"articles/growing-on-social-media-is-easy-actually.html","done":true,"ext":null},{"slug":"life-is-a-mind-game-heres-how-you","date":"2026-04-26","zh":"人生是一场心理游戏，这是赢法","en":"Life is a mind game, here's how you win","summary":"为什么大多数人走不到最后。","words":3835,"paid":false,"file":"articles/life-is-a-mind-game-heres-how-you.html","done":true,"ext":null},{"slug":"why-your-life-feels-fake-an-antidote","date":"2026-04-19","zh":"为什么你的人生感觉很假","en":"Why your life feels fake: an antidote to the life you were sold","summary":"大多数人过的是别人写好的剧本，以及如何判断你是不是其中一个。","words":5375,"paid":false,"file":"articles/why-your-life-feels-fake-an-antidote.html","done":true,"ext":null},{"slug":"im-begging-you-to-write-more-essays","date":"2026-04-02","zh":"求你多写点文章","en":"I'm begging you to write more essays","summary":"学得更快、想得更深，顺便救救人类。","words":2953,"paid":false,"file":"articles/im-begging-you-to-write-more-essays.html","done":true,"ext":null},{"slug":"how-to-become-so-creative-it-feels","date":"2026-03-24","zh":"如何变得有创造力到近乎违法","en":"How to become so creative it feels illegal","summary":"给那些想慢下来、重新感到活着的人。","words":3476,"paid":false,"file":"articles/how-to-become-so-creative-it-feels.html","done":true,"ext":null},{"slug":"how-to-start-a-one-person-business","date":"2026-03-11","zh":"2026 年如何开始一人公司（情况变了）","en":"How to start a one-person business in 2026 (things changed)","summary":"人人都有 AI 之后，百万美元的一人生意长什么样。","words":2990,"paid":false,"file":"articles/how-to-start-a-one-person-business.html","done":true,"ext":null},{"slug":"how-to-think-like-a-strategic-genius","date":"2026-01-27","zh":"如何像战略天才一样思考（五维思考）","en":"How to think like a strategic genius (5d thinking)","summary":"当所有人把思考外包给机器，思考就是你的竞争优势。","words":3350,"paid":false,"file":"articles/how-to-think-like-a-strategic-genius.html","done":true,"ext":null},{"slug":"the-future-of-work-when-work-is-meaningless","date":"2026-01-21","zh":"当工作失去意义，未来的工作是什么","en":"The future of work when work is meaningless","summary":"金钱、AI、工作，以及创作者的前景。","words":5774,"paid":false,"file":"articles/the-future-of-work-when-work-is-meaningless.html","done":true,"ext":null},{"slug":"if-you-have-multiple-interests-do","date":"2026-01-10","zh":"如果你有多个兴趣，别浪费接下来 2-3 年","en":"If you have multiple interests, do not waste the next 2-3 years","summary":"他们想把你装进盒子，别让他们得逞。这是你最后的优势。","words":5281,"paid":false,"file":"articles/if-you-have-multiple-interests-do.html","done":true,"ext":null},{"slug":"the-death-of-value-based-content","date":"2026-01-07","zh":"如何在死掉的互联网里脱颖而出","en":"How to stand out in the dead internet","summary":"「价值型内容已死」之后该怎么办。","words":3409,"paid":false,"file":"articles/the-death-of-value-based-content.html","done":true,"ext":null},{"slug":"how-id-build-a-one-person-business","date":"2026-01-03","zh":"如果 2026 年重新开始，我会这样建一人公司","en":"How I'd build a one-person business if I started over in 2026","summary":"信息产品已死，AI 改变了游戏。","words":3714,"paid":false,"file":"articles/how-id-build-a-one-person-business.html","done":true,"ext":null},{"slug":"something-is-different-about-2026","date":"2025-12-31","zh":"你大约有 24 个月来学这些技能","en":"You have about 24 months to learn these skills","summary":"AI 反弹已经到来，以及该学什么。","words":2353,"paid":false,"file":"articles/something-is-different-about-2026.html","done":true,"ext":null},{"slug":"how-to-fix-your-entire-life-in-1","date":"2025-12-23","zh":"如何在 1 天内修好你的一生","en":"How to fix your entire life in 1 day","summary":"在 2026 年之前做完这件事。","words":5503,"paid":false,"file":"articles/how-to-fix-your-entire-life-in-1.html","done":true,"ext":null},{"slug":"they-wont-teach-this-skill-in-school","date":"2025-12-05","zh":"每个有野心的人都必须学会这项技能","en":"Every ambitious person must learn this skill","summary":"所有人都说不道德的那项技能。","words":2573,"paid":false,"file":"articles/they-wont-teach-this-skill-in-school.html","done":true,"ext":null},{"slug":"how-to-use-ai-better-than-99-of-people","date":"2025-11-27","zh":"如何比 99% 的人更会用 AI","en":"How to use AI better than 99% of people","summary":"大多数人根本不会用 AI。","words":3640,"paid":false,"file":"articles/how-to-use-ai-better-than-99-of-people.html","done":true,"ext":null},{"slug":"how-to-articulate-yourself-intelligently","date":"2025-11-20","zh":"如何把话说得聪明","en":"How to articulate yourself intelligently","summary":"内在精选集，加 3 个练习框架。","words":2805,"paid":false,"file":"articles/how-to-articulate-yourself-intelligently.html","done":true,"ext":null},{"slug":"the-most-important-skill-to-learn","date":"2025-11-11","zh":"未来 10 年最该学的技能","en":"The most important skill to learn in the next 10 years","summary":"为什么通才在 AI 时代胜出。","words":4502,"paid":false,"file":"articles/the-most-important-skill-to-learn.html","done":true,"ext":null},{"slug":"the-death-of-the-9-5-job-why-everyone","date":"2025-11-03","zh":"每周 40 小时工作制的问题","en":"The problem with the 40 hour workweek","summary":"以及朝九晚五的死亡。","words":4414,"paid":false,"file":"articles/the-death-of-the-9-5-job-why-everyone.html","done":true,"ext":null},{"slug":"how-to-not-waste-your-20s-this-may","date":"2025-10-25","zh":"别浪费你的 20 岁（可能会刺痛你）","en":"How to not waste your 20s (this may sting)","summary":"学会学习、学会思考、学会赚钱。","words":3633,"paid":false,"file":"articles/how-to-not-waste-your-20s-this-may.html","done":true,"ext":null},{"slug":"a-dopamine-detox-to-reset-your-life","date":"2025-10-16","zh":"30 天多巴胺排毒，重置你的人生","en":"A dopamine detox to reset your life in 30 days","summary":"因为现代生活已经糊成一团，而你受够了。","words":2835,"paid":false,"file":"articles/a-dopamine-detox-to-reset-your-life.html","done":true,"ext":null},{"slug":"how-to-become-so-focused-it-feels","date":"2025-10-09","zh":"如何专注到近乎违法","en":"How to become so focused it feels illegal","summary":"关于深度工作与改变大脑的技术。","words":4809,"paid":false,"file":"articles/how-to-become-so-focused-it-feels.html","done":true,"ext":null},{"slug":"the-social-matrix-how-the-1-elites","date":"2025-10-02","zh":"是的，母体是真的，这是逃离方法","en":"Yes, the matrix is real, here's how to escape it","summary":"它不是你想的那样。","words":3099,"paid":false,"file":"articles/the-social-matrix-how-the-1-elites.html","done":true,"ext":null},{"slug":"you-wont-be-the-same-person-in-6","date":"2025-09-23","zh":"6 个月后你不再是同一个人","en":"You won't be the same person in 6 months (how to master anything, fast)","summary":"为什么改变人生这么难。","words":4557,"paid":false,"file":"articles/you-wont-be-the-same-person-in-6.html","done":true,"ext":null},{"slug":"what-the-fck-is-wrong-with-everyone","date":"2025-09-17","zh":"大家现在到底怎么了","en":"What the f*ck is wrong with everyone right now?","summary":"世界正在发疯（一如既往）。","words":3378,"paid":false,"file":"articles/what-the-fck-is-wrong-with-everyone.html","done":true,"ext":null},{"slug":"why-work-life-balance-will-ruin-your","date":"2025-09-15","zh":"「工作生活平衡」会毁了你","en":"Why \"work-life balance\" will ruin your life","summary":"想要有滋味的人生，你需要极端。","words":2022,"paid":false,"file":"articles/why-work-life-balance-will-ruin-your.html","done":true,"ext":null},{"slug":"how-to-become-more-intelligent-than","date":"2025-09-10","zh":"因为 AI，人类正在变笨","en":"Humans are getting stupider because of AI","summary":"以及如何比 99% 的 AI 用户更聪明。","words":3043,"paid":false,"file":"articles/how-to-become-more-intelligent-than.html","done":true,"ext":null},{"slug":"social-media-keeps-getting-worse","date":"2025-09-02","zh":"社交媒体的死亡（以及内容创作的未来）","en":"The death of social media (& the future of content creation)","summary":"到底发生了什么。","words":2209,"paid":false,"file":"articles/social-media-keeps-getting-worse.html","done":true,"ext":null},{"slug":"the-3-levels-of-money-how-to-escape","date":"2025-09-01","zh":"金钱的 3 个层级（如何逃离工资奴役）","en":"The 3 Levels Of Money (How To Escape Wage Slavery)","summary":"如何追求你一生的事业。","words":3709,"paid":false,"file":"articles/the-3-levels-of-money-how-to-escape.html","done":true,"ext":null},{"slug":"a-complete-knowledge-base-of-human","date":"2025-08-31","zh":"HUMAN 3.0 完整知识库","en":"A Complete Knowledge Base Of HUMAN 3.0","summary":"模型、科学验证、历史脉络、文明影响、测评与练习。","words":12604,"paid":false,"file":"articles/a-complete-knowledge-base-of-human.html","done":true,"ext":null},{"slug":"prompt-human-30-self-discovery-and","date":"2025-08-27","zh":"提示词：HUMAN 3.0 自我探索与元类型测试","en":"Prompt: HUMAN 3.0 Self-Discovery & Metatype Test","summary":"找出你的下一个核心问题，看见盲区，放大潜力。","words":4335,"paid":false,"file":"articles/prompt-human-30-self-discovery-and.html","done":true,"ext":null},{"slug":"human-30-a-map-to-reach-the-top-1","date":"2025-08-26","zh":"HUMAN 3.0：通往前 1% 的地图","en":"HUMAN 3.0 – A Map To Reach The Top 1%","summary":"一套在人生所有领域放大潜力的准则。","words":4778,"paid":false,"file":"articles/human-30-a-map-to-reach-the-top-1.html","done":true,"ext":null},{"slug":"the-1-million-dollar-morning-routine","date":"2025-08-22","zh":"改变我人生的 2 小时晨间流程","en":"The 2 hour morning routine that changed my life","summary":"没有冥想、冷水澡之类的东西。","words":3000,"paid":false,"file":"articles/the-1-million-dollar-morning-routine.html","done":true,"ext":null},{"slug":"12-rules-to-change-your-life-in-12","date":"2025-08-18","zh":"12 条规则，12 个月改变你的人生","en":"12 rules to change your life in 12 months","summary":"我的人生哲学，浓缩版。","words":4829,"paid":false,"file":"articles/12-rules-to-change-your-life-in-12.html","done":true,"ext":null},{"slug":"most-creators-will-fail-in-the-next","date":"2025-08-14","zh":"AI 永远不会取代真正的创作者","en":"AI will never replace true creators","summary":"理解这一点，你就稳了。","words":2712,"paid":false,"file":"articles/most-creators-will-fail-in-the-next.html","done":true,"ext":null},{"slug":"learn-these-ai-proof-skills-if-you","date":"2025-08-11","zh":"花 6-12 个月学这些技能，一辈子够用","en":"Learn these skills for 6-12 months and you're set for life","summary":"你会赚到比「高薪职业」多好几倍的钱。","words":3294,"paid":false,"file":"articles/learn-these-ai-proof-skills-if-you.html","done":true,"ext":null},{"slug":"youre-not-depressed-you-just-dont","date":"2025-08-05","zh":"你没坏掉，你只是没有任务","en":"You're not broken, you just don't have a quest","summary":"如何拿回人生的控制权。","words":1221,"paid":false,"file":"articles/youre-not-depressed-you-just-dont.html","done":true,"ext":null},{"slug":"you-dont-need-a-niche-you-need-a","date":"2025-07-31","zh":"你不需要定位，你需要观点","en":"You don't need a niche, you need a point of view","summary":"创作者经济生存指南。","words":1824,"paid":false,"file":"articles/you-dont-need-a-niche-you-need-a.html","done":true,"ext":null},{"slug":"you-can-just-make-more-money","date":"2025-07-28","zh":"你可以直接多赚点钱","en":"You can just make more money","summary":"体力劳动与情绪劳动的报酬差别。","words":2303,"paid":false,"file":"articles/you-can-just-make-more-money.html","done":true,"ext":null},{"slug":"self-discipline-is-easy-actually","date":"2025-07-24","zh":"自律其实很简单","en":"Self-discipline is easy, actually","summary":"清晰 vs 强迫。","words":1954,"paid":false,"file":"articles/self-discipline-is-easy-actually.html","done":true,"ext":null},{"slug":"you-have-36-months-to-make-it","date":"2025-07-21","zh":"你大约有 36 个月做成它","en":"You have about 36 months to make it","summary":"为什么所有人都在抢着变富。","words":2398,"paid":false,"file":"articles/you-have-36-months-to-make-it.html","done":true,"ext":null},{"slug":"you-can-learn-anything-in-2-weeks","date":"2025-07-17","zh":"任何东西你都能在 2 周内学会","en":"You can learn anything in 2 weeks","summary":"听起来很疯，但确实如此。","words":1881,"paid":false,"file":"articles/you-can-learn-anything-in-2-weeks.html","done":true,"ext":null},{"slug":"these-3-decisions-will-determine","date":"2025-07-10","zh":"这 3 个决定决定你会不会变富","en":"These 3 decisions will determine if you get rich","summary":"妄想级的目标会重写你的大脑。","words":1891,"paid":false,"file":"articles/these-3-decisions-will-determine.html","done":true,"ext":null},{"slug":"20-30-years-old-is-the-tutorial-phase","date":"2025-07-03","zh":"20-30 岁是教程阶段，别搞砸了","en":"20-30 Years Old Is The Tutorial Phase, Don't F*ck It Up","summary":"避开 3 件事，做 3 件事。","words":2560,"paid":false,"file":"articles/20-30-years-old-is-the-tutorial-phase.html","done":true,"ext":null},{"slug":"how-to-think-like-a-genius-the-map","date":"2025-06-26","zh":"如何像天才一样思考（所有知识的地图）","en":"how to think like a genius (the map of all knowledge)","summary":"成为二级思考者。","words":2085,"paid":false,"file":"articles/how-to-think-like-a-genius-the-map.html","done":true,"ext":null},{"slug":"this-single-decision-will-determine","date":"2025-06-23","zh":"这一个决定会决定你人生的大部分","en":"This single decision will determine most of your life","summary":"为什么犹豫就是死亡。","words":1714,"paid":false,"file":"articles/this-single-decision-will-determine.html","done":true,"ext":null},{"slug":"the-death-of-thoughtful-creation","date":"2025-06-19","zh":"深度创作的死亡（以及如何领先所有人）","en":"the death of thoughtful creation (& how to get ahead of everyone else)","summary":"每天练这项技能 2-4 小时。","words":3111,"paid":false,"file":"articles/the-death-of-thoughtful-creation.html","done":true,"ext":null},{"slug":"be-a-loser-if-you-want-to-be-happy","date":"2025-06-12","zh":"想快乐，就当个失败者","en":"if you want to be happy, be a loser","summary":"为什么合群会让你不成功。","words":2742,"paid":false,"file":"articles/be-a-loser-if-you-want-to-be-happy.html","done":true,"ext":null},{"slug":"how-to-be-more-disagreeable-create","date":"2025-06-09","zh":"回避冲突正在毁掉你的人生","en":"why avoiding conflict is ruining your life","summary":"如何把现实掰向对你有利的一边。","words":1873,"paid":false,"file":"articles/how-to-be-more-disagreeable-create.html","done":true,"ext":null},{"slug":"you-need-to-be-extreme-if-you-want","date":"2025-06-05","zh":"想让生活改变，你需要极端","en":"you need to be extreme if you want your life to change","summary":"消失 3-6 个月，专注 4 个习惯。","words":3568,"paid":false,"file":"articles/you-need-to-be-extreme-if-you-want.html","done":true,"ext":null},{"slug":"main-character-energy-mce","date":"2025-06-02","zh":"你不是生来当 NPC 的","en":"you weren't born to be an NPC","summary":"如何成为自己人生的主角。","words":3563,"paid":false,"file":"articles/main-character-energy-mce.html","done":true,"ext":null},{"slug":"how-to-build-a-better-personal-brand","date":"2025-05-29","zh":"如何建一个胜过 99% 人的个人品牌","en":"how to build a better personal brand than 99% of people","summary":"信任矩阵。","words":3000,"paid":false,"file":"articles/how-to-build-a-better-personal-brand.html","done":true,"ext":null},{"slug":"how-average-people-will-get-rich","date":"2025-05-26","zh":"普通人如何靠 AI 变富","en":"how average people will get rich with AI","summary":"建一门 AI 优先的一人生意。","words":3654,"paid":false,"file":"articles/how-average-people-will-get-rich.html","done":true,"ext":null},{"slug":"purpose-and-profit-a-guide-to-discovering","date":"2025-05-25","zh":"目的与利润：发现你一生的事业","en":"Purpose & Profit – A Guide To Discovering Your Life's Work","summary":"整本书，免费。","words":27601,"paid":false,"file":"articles/purpose-and-profit-a-guide-to-discovering.html","done":true,"ext":null},{"slug":"how-smart-creators-will-make-money","date":"2025-05-22","zh":"聪明的创作者 2026 年怎么赚钱","en":"how smart creators will make money in 2026","summary":"数字产品的未来。","words":2792,"paid":false,"file":"articles/how-smart-creators-will-make-money.html","done":true,"ext":null},{"slug":"7-bad-habits-preventing-you-from","date":"2025-05-19","zh":"阻止你过上想要生活的 7 个坏习惯","en":"7 bad habits preventing you from the life you want","summary":"第 3 条会刺痛你。","words":2854,"paid":false,"file":"articles/7-bad-habits-preventing-you-from.html","done":true,"ext":null},{"slug":"the-most-profitable-niche-in-the","date":"2025-05-15","zh":"创作者经济里现在最赚钱的定位","en":"The Most Profitable Niche In The Creator Economy Right Now","summary":"你并不是那个定位。","words":2716,"paid":false,"file":"articles/the-most-profitable-niche-in-the.html","done":true,"ext":null},{"slug":"the-unpleasant-truth-ai-is-coming","date":"2025-05-13","zh":"不愉快的真相：AI 正在抢你的工作","en":"the unpleasant truth: AI is coming for your job","summary":"至少 Fiverr、Shopify、Duolingo 的 CEO 这么认为。","words":3149,"paid":false,"file":"articles/the-unpleasant-truth-ai-is-coming.html","done":true,"ext":null},{"slug":"the-deep-work-routine-that-changed","date":"2025-05-08","zh":"改变我人生的深度工作流程","en":"the deep work routine that changed my life","summary":"每天做 2-4 小时。","words":2091,"paid":false,"file":"articles/the-deep-work-routine-that-changed.html","done":true,"ext":null},{"slug":"the-future-proof-manifesto","date":"2025-05-06","zh":"面向未来的宣言","en":"the future-proof manifesto","summary":"未来 10 年如何保持相关性。","words":1415,"paid":false,"file":"articles/the-future-proof-manifesto.html","done":true,"ext":null},{"slug":"how-to-launch-into-a-completely-new","date":"2025-05-03","zh":"如何启动一段全新的人生（旧版）","en":"how to launch into a completely new life","summary":"把你的人生变成一场游戏。","words":1970,"paid":false,"file":"articles/how-to-launch-into-a-completely-new.html","done":true,"ext":null}];
+const ORIGIN = 'https://letters.thedankoe.com/p/';
+const list = document.getElementById('list');
+const q = document.getElementById('q');
+const f = document.getElementById('f');
+let onlyDone = false;
+
+function esc(s){
+  return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+}
+
+function render(){
+  const term = q.value.trim().toLowerCase();
+  const rows = DATA.filter(it => {
+    if (onlyDone && !it.done) return false;
+    if (!term) return true;
+    return (it.zh + ' ' + it.en + ' ' + it.summary).toLowerCase().includes(term);
+  });
+  if (!rows.length){ list.innerHTML = '<div class="empty">没有匹配的文章</div>'; return; }
+  let out = '', year = '';
+  for (const it of rows){
+    const y = it.date.slice(0,4);
+    if (y !== year){ year = y; out += '<div class="year">' + y + '</div>'; }
+    const tags = (it.done ? '<span class="tag done">已译</span>' : '<span class="tag wait">待译</span>')
+      + (it.paid ? '<span class="tag paid">付费</span>' : '');
+    out += '<button class="item" data-slug="' + esc(it.slug) + '">'
+      + '<div class="row"><h2>' + esc(it.zh) + '</h2><span class="meta">' + it.date.slice(5) + ' · ' + it.words + ' 词</span></div>'
+      + '<p>' + tags + esc(it.summary) + '</p></button>';
+  }
+  list.innerHTML = out;
+}
+
+list.addEventListener('click', e => {
+  const el = e.target.closest('.item');
+  if (!el) return;
+  const it = DATA.find(x => x.slug === el.dataset.slug);
+  if (it) open(it);
+});
+
+const reader = document.getElementById('reader');
+const rt = document.getElementById('rt');
+const rbody = document.getElementById('rbody');
+const rl = document.getElementById('rl');
+let artStyle = null;
+let loadToken = 0;
+
+function clearBody(){
+  rbody.innerHTML = '';
+  if (artStyle && artStyle.parentNode) artStyle.parentNode.removeChild(artStyle);
+  artStyle = null;
+  rbody.scrollTop = 0;
+}
+
+function notice(title, text, kind){
+  rbody.innerHTML = '<div class="loading"><p style="color:var(--accent);font-size:13px;letter-spacing:.15em;margin:0 0 12px">' + kind + '</p>'
+    + '<p style="font-size:17px;color:var(--ink);margin:0 0 10px">' + esc(title) + '</p>'
+    + '<p style="margin:0">' + esc(text) + '</p></div>';
+}
+
+async function open(it){
+  rt.textContent = it.zh;
+  rl.href = ORIGIN + it.slug;
+  reader.classList.add('on');
+  document.body.style.overflow = 'hidden';
+  window.scrollTo(0, 0);
+  history.replaceState(null, '', '#' + it.slug);
+  clearBody();
+  const token = ++loadToken;
+  if (it.ext){
+    notice(it.zh, it.ext, '已译');
+    return;
+  }
+  if (!it.done){
+    notice(it.zh, it.summary + ' —— 这篇还没有译文，点右上角「原文」读英文版。', '待译');
+    return;
+  }
+  rbody.innerHTML = '<div class="loading">载入中…</div>';
+  try {
+    const res = await fetch(it.file);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const text = await res.text();
+    if (token !== loadToken) return;
+    const doc = new DOMParser().parseFromString(text, 'text/html');
+    const styleEl = doc.querySelector('style');
+    const art = doc.querySelector('article') || doc.body;
+    rbody.innerHTML = '';
+    if (styleEl){
+      artStyle = document.createElement('style');
+      artStyle.textContent = styleEl.textContent;
+      document.head.appendChild(artStyle);
+    }
+    rbody.appendChild(document.adoptNode(art));
+    rbody.scrollTop = 0;
+  } catch (e) {
+    if (token !== loadToken) return;
+    notice(it.zh, '载入失败：' + e.message, '错误');
+  }
+}
+
+document.getElementById('close').onclick = () => {
+  reader.classList.remove('on');
+  document.body.style.overflow = '';
+  loadToken++;
+  clearBody();
+  history.replaceState(null, '', location.pathname);
+};
+
+q.addEventListener('input', render);
+f.onclick = () => {
+  onlyDone = !onlyDone;
+  f.setAttribute('aria-pressed', String(onlyDone));
+  render();
+};
+
+render();
+
+if (location.hash.length > 1){
+  const it = DATA.find(x => x.slug === location.hash.slice(1));
+  if (it) open(it);
+}
+
+window.onerror = function(msg){
+  const d = document.createElement('div');
+  d.style.cssText = 'position:fixed;bottom:0;left:0;right:0;padding:12px 16px;background:#a8442a;color:#fff;font-size:13px;z-index:99';
+  d.textContent = '页面出错：' + msg;
+  document.body.appendChild(d);
+};
+</script>
+</body>
+</html>
