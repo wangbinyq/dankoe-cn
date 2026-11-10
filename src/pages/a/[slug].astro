@@ -1,0 +1,127 @@
+---
+import Base from '../../layouts/Base.astro';
+import articles from '../../data/articles.json';
+
+export function getStaticPaths() {
+  return articles.map((article, i) => ({
+    params: { slug: article.slug },
+    props: {
+      article,
+      newer: articles[i - 1] ?? null,
+      older: articles[i + 1] ?? null,
+    },
+  }));
+}
+
+const { article, newer, older } = Astro.props;
+const date = article.date;
+---
+
+<Base title={`${article.zh} · Dan Koe 中文译文库`} description={article.summary}>
+  <header class="bar">
+    <a class="back" href="../index.html">目录</a>
+    <span class="who">Dan Koe · {date}</span>
+    <a class="src" href={`https://letters.thedankoe.com/p/${article.slug}`} target="_blank" rel="noopener">原文</a>
+  </header>
+
+  <article class="head">
+    <h1>{article.zh}</h1>
+    {article.sub && <p class="sub">{article.sub}</p>}
+    <p class="meta">原文约 {article.words} 词</p>
+  </article>
+
+  <div class="prose" set:html={article.body} />
+
+  <nav class="pager">
+    {newer ? <a class="prev" href={`${newer.slug}.html`}>← {newer.zh}</a> : <span />}
+    {older ? <a class="next" href={`${older.slug}.html`}>{older.zh} →</a> : <span />}
+  </nav>
+
+  <p class="off">译文为学习用途，版权归 Dan Koe 所有。</p>
+<style>
+  .bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    max-width: 660px;
+    margin: 0 auto;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .bar .who {
+    flex: 1;
+    min-width: 0;
+    font-size: 12.5px;
+    color: var(--soft);
+    text-align: center;
+  }
+
+  .bar a {
+    font-size: 13px;
+    text-decoration: none;
+    border: 1px solid var(--rule);
+    background: var(--card);
+    border-radius: 8px;
+    padding: 6px 11px;
+    white-space: nowrap;
+  }
+
+  .head {
+    max-width: 660px;
+    margin: 0 auto;
+    padding: 30px 20px 0;
+  }
+
+  .head h1 {
+    font-size: clamp(25px, 6.4vw, 34px);
+    line-height: 1.4;
+    margin: 0 0 10px;
+    letter-spacing: -0.01em;
+  }
+
+  .head .sub {
+    font-size: 15px;
+    color: var(--soft);
+    margin: 0 0 12px;
+    line-height: 1.7;
+  }
+
+  .head .meta {
+    font-size: 12.5px;
+    color: var(--soft);
+    margin: 0 0 18px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .pager {
+    max-width: 660px;
+    margin: 30px auto 0;
+    padding: 18px 20px 0;
+    border-top: 1px solid var(--rule);
+    display: flex;
+    gap: 14px;
+    justify-content: space-between;
+    font-size: 13.5px;
+  }
+
+  .pager a {
+    text-decoration: none;
+    color: var(--accent);
+    max-width: 48%;
+  }
+
+  .pager .next {
+    text-align: right;
+  }
+
+  .off {
+    max-width: 660px;
+    margin: 26px auto 60px;
+    padding: 0 20px;
+    font-size: 12px;
+    color: var(--soft);
+  }
+</style>
+</Base>

@@ -1,0 +1,253 @@
+---
+import Base from '../layouts/Base.astro';
+import articles from '../data/articles.json';
+
+const total = articles.length;
+const words = articles.reduce((n, a) => n + (a.words ?? 0), 0);
+const years = [...new Set(articles.map((a) => a.date.slice(0, 4)))];
+const list = articles.map(({ slug, date, zh, summary, words }) => ({ slug, date, zh, summary, words }));
+---
+
+<Base title="Dan Koe 中文译文库" description="Dan Koe 免费通讯的中文翻译，共 74 篇。">
+  <header class="top">
+    <div class="brand">
+      <h1><a href="./index.html">Dan Koe 中文译文库</a></h1>
+      <span class="stat">{total} 篇 · 原文 {words.toLocaleString('en-US')} 词</span>
+    </div>
+    <div class="tools">
+      <input type="search" id="q" placeholder="搜索标题或摘要" autocomplete="off" aria-label="搜索" />
+      <button class="chip" id="f" aria-pressed="false">只看年份</button>
+    </div>
+    <nav class="years" id="years">
+      {years.map((y) => <button class="chip small" data-year={y} aria-pressed="false">{y}</button>)}
+    </nav>
+  </header>
+
+  <main id="list"></main>
+
+  <p class="empty" id="empty" hidden>没有匹配的文章</p>
+
+  <footer class="foot">
+    <p>
+      译文按发布时间从新到旧排列，共 {total} 篇免费文章；付费文章没有收录。<br />
+      原文：<a href="https://letters.thedankoe.com" target="_blank" rel="noopener">letters.thedankoe.com</a>
+      · 版权归 Dan Koe 所有。
+    </p>
+  </footer>
+
+  <script type="application/json" id="data" is:inline set:html={JSON.stringify(list)}></script>
+<script is:inline>
+  const data = JSON.parse(document.getElementById('data').textContent);
+  const list = document.getElementById('list');
+  const empty = document.getElementById('empty');
+  const q = document.getElementById('q');
+  const yearsBox = document.getElementById('years');
+  let year = null;
+  let open = null;
+
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+  function render() {
+    const term = q.value.trim().toLowerCase();
+    const rows = data.filter((it) => {
+      if (year && it.date.slice(0, 4) !== year) return false;
+      if (!term) return true;
+      return (it.zh + ' ' + it.summary).toLowerCase().includes(term);
+    });
+    empty.hidden = rows.length > 0;
+    let html = '';
+    let y = '';
+    for (const it of rows) {
+      const yy = it.date.slice(0, 4);
+      if (yy !== y) {
+        y = yy;
+        html += '<div class="year">' + yy + '</div>';
+      }
+      html +=
+        '<a class="item" href="a/' + esc(it.slug) + '.html">' +
+        '<div class="row"><h2>' + esc(it.zh) + '</h2>' +
+        '<span class="meta">' + it.date.slice(5) + ' · ' + it.words + ' 词</span></div>' +
+        '<p>' + esc(it.summary) + '</p></a>';
+    }
+    list.innerHTML = html;
+  }
+
+  q.addEventListener('input', render);
+  yearsBox.addEventListener('click', (e) => {
+    const b = e.target.closest('button[data-year]');
+    if (!b) return;
+    const y = b.dataset.year;
+    year = year === y ? null : y;
+    for (const btn of yearsBox.querySelectorAll('button')) {
+      btn.setAttribute('aria-pressed', String(btn.dataset.year === year));
+    }
+    render();
+  });
+
+  render();
+</script>
+
+<style is:global>
+  .top {
+    padding: 28px 18px 6px;
+    max-width: 760px;
+    margin: 0 auto;
+  }
+
+  .brand {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .brand h1 {
+    font-size: 21px;
+    margin: 0;
+    letter-spacing: -0.01em;
+  }
+
+  .brand h1 a {
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  .stat {
+    font-size: 12.5px;
+    color: var(--soft);
+  }
+
+  .tools {
+    display: flex;
+    gap: 8px;
+    margin-top: 14px;
+  }
+
+  input[type='search'] {
+    flex: 1;
+    min-width: 0;
+    border: 1px solid var(--rule);
+    background: var(--card);
+    border-radius: 9px;
+    padding: 9px 12px;
+    font-size: 15px;
+    font-family: inherit;
+    color: var(--ink);
+    outline: none;
+  }
+
+  input[type='search']:focus {
+    border-color: var(--accent);
+  }
+
+  .chip {
+    border: 1px solid var(--rule);
+    background: var(--card);
+    border-radius: 999px;
+    padding: 8px 12px;
+    font-size: 13px;
+    font-family: inherit;
+    color: var(--soft);
+    white-space: nowrap;
+    cursor: pointer;
+  }
+
+  .chip[aria-pressed='true'] {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+
+  .years {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+  }
+
+  .chip.small {
+    padding: 4px 10px;
+    font-size: 12px;
+  }
+
+  main {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 8px 18px 40px;
+  }
+
+  .year {
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    color: var(--accent);
+    margin: 26px 0 10px;
+    font-weight: 600;
+  }
+
+  .item {
+    display: block;
+    border: 1px solid var(--rule);
+    background: var(--card);
+    border-radius: 12px;
+    padding: 14px 15px;
+    margin-bottom: 9px;
+    color: inherit;
+    text-decoration: none;
+    transition: border-color 0.15s;
+  }
+
+  .item:hover {
+    border-color: var(--accent);
+  }
+
+  .item .row {
+    display: flex;
+    gap: 8px;
+    align-items: baseline;
+    justify-content: space-between;
+  }
+
+  .item h2 {
+    font-size: 16.5px;
+    margin: 0 0 4px;
+    line-height: 1.5;
+    font-weight: 650;
+  }
+
+  .item .meta {
+    font-size: 12px;
+    color: var(--soft);
+    white-space: nowrap;
+  }
+
+  .item p {
+    margin: 0;
+    font-size: 13.5px;
+    color: var(--soft);
+    line-height: 1.65;
+  }
+
+  .empty {
+    max-width: 760px;
+    margin: 40px auto;
+    padding: 0 18px;
+    text-align: center;
+    color: var(--soft);
+    font-size: 14px;
+  }
+
+  .foot {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 20px 18px 60px;
+    font-size: 12.5px;
+    color: var(--soft);
+    line-height: 1.8;
+    border-top: 1px solid var(--rule);
+  }
+
+  .foot p {
+    margin: 0;
+  }
+</style>
+</Base>
